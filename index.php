@@ -20,6 +20,18 @@ $container['db'] = function ($c) {
 	}
 };
 
+$container['UserController'] = function ($c) {
+    return new \App\Controllers\UserController($c);
+};
+
+$container['EmployeeController'] = function ($c) {
+    return new \App\Controllers\EmployeeController($c);
+};
+
+$container['CheckinController'] = function ($c) {
+    return new \App\Controllers\CheckinController($c);
+};
+
 $app->options('./{routes:.+}', function ($req, $res) {
 	return $res;
 });
@@ -43,74 +55,17 @@ $app->add(function ($req, $res, $next) {
 });
 
 /** =============== ROUTES =============== */
-$app->get('/user/{cid}', function ($req, $res) {
-	try {
-		$cid = $req->getAttribute('cid');
-		$conn = $this->db;
+$app->get('/user/{cid}', 'UserController:user');
 
-		$sql = "SELECT e.*, p.position_name 
-				FROM employees e 
-				LEFT JOIN positions p ON (e.position_id=p.id) 
-				WHERE (emp_id=:cid)";
+$app->get('/employee/{cid}', 'EmployeeController:employee');
+$app->get('/employees', 'EmployeeController:employeeList');
+$app->post('/employee-add', 'EmployeeController:employeeAdd');
+$app->delete('/employee-del/{cid}', 'EmployeeController:employeeDel');
+$app->get('/positions', 'EmployeeController:positionList');
 
-		$pre = $conn->prepare($sql, [PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY]);
-		$values = [':cid' => $cid];
-
-		$pre->execute($values);
-		$result = $pre->fetch();
-
-		if ($result) {
-			return $res->withJson([
-				'employee' => [
-					'cid' => $result['emp_id'],
-					'fullName' => $result['prefix'] . $result['emp_fname']. ' ' .$result['emp_lname'],
-					'position' => $result['position_name']
-				]
-			], 200);
-		} else {
-			return $res->withJson([
-				$result
-			]);
-		}		
-	} catch (Exception $e) {
-		return $res->withJson([
-			'error' => $e->getMessage()
-		], 442);
-	}
-});
-
-$app->post('/checkin', function ($req, $res) {
-	try {
-		$conn = $this->db;
-		
-		$sql = "INSERT INTO checkin (emp_id, checkin_date, timein, created_at, updated_at)VALUES(?,?,?,?,?)";
-		
-		$pre = $conn->prepare($sql, [PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY]);
-		$values = [
-			$req->getParam('emp_id'), 
-			$req->getParam('checkin_date'), 
-			$req->getParam('timein'), 
-			date('Y-m-d H:i:s'), 
-			date('Y-m-d H:i:s')
-		];
-
-		if ($pre->execute($values)) {
-			return $res->withJson([
-				'status' =>'success',
-				'timein' => date('Y-m-d H:i:s')
-			], 200);
-		} else {
-			return $res->withJson([
-				'status' => 'error'
-			], 422);
-		}
-	} catch (Exception $e) {
-		return $res->withJson([
-			'status' => 'error',
-			'message' => $e->getMessage()
-		], 442);
-	}
-});
+$app->get('/checkin', 'CheckinController:checkinList');
+$app->post('/checkin', 'CheckinController:checkin');
+$app->post('/upload', 'CheckinController:upload');
 
 /** use this route if page not found. */
 $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/routes:.+', function ($req, $res) {
