@@ -90,25 +90,33 @@ class CheckinController
     {
     	// Set path to upload file.
 		$target_dir		= $_SERVER['DOCUMENT_ROOT'] . "/uploads/";
-		$target_file 	= $target_dir . basename($_FILES['file']['name']) . ".png";
 
-		// Get image file type.
-		$imageFileType 	= strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+		if (file_exists($target_dir) && is_dir($target_dir)) {
+			$target_file 	= $target_dir . basename($_FILES['file']['name']) . ".png";
 
-		$target_file_hash 	= $target_dir . md5(uniqid(rand(), true)) . ".png";
+			// Get image file type.
+			$imageFileType 	= strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-		// Check file
-		$check = getimagesize($_FILES['file']['tmp_name']);
+			$target_file_hash 	= $target_dir . md5(uniqid(rand(), true)) . ".png";
 
-		if(move_uploaded_file($_FILES['file']['tmp_name'], $target_file)) {
-			return $res->withJson([
-				'status' => 'success',
-				'message' => 'The file ' . basename($_FILES['file']['name']) . ' has been uploaded.',
-			]);
+			// Check file
+			$check = getimagesize($_FILES['file']['tmp_name']);
+
+			if(move_uploaded_file($_FILES['file']['tmp_name'], $target_file)) {
+				return $res->withJson([
+					'status' => 'success',
+					'message' => 'The file ' . basename($_FILES['file']['name']) . ' has been uploaded.',
+				]);
+			} else {
+				return $res->withJson([
+					'status' => 'error',
+					'message' => 'Sorry, there was an error uploading your file.',
+				]);
+			}
 		} else {
 			return $res->withJson([
 				'status' => 'error',
-				'message' => 'Sorry, there was an error uploading your file.',
+				'message' => '/uploads/ directory not found.',
 			]);
 		}
     }
