@@ -14,7 +14,7 @@ $container['db'] = function ($c) {
 			PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
 		];
 
-		return new PDO("mysql:host=" . $db['host'] . ";dbname=" . $db['dbname'], $db['username'], $db['password'], $options);
+		return new PDO("mysql:host=" .$db['host']. ";dbname=" .$db['dbname']. "; charset=utf8", $db['username'], $db['password'], $options);
 	} catch (Exception $e) {
 		return $e->getMessage();
 	}
