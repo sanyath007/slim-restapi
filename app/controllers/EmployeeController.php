@@ -207,12 +207,11 @@ class EmployeeController
 			if ($pre->execute()) {
 				return $res->withJson([
 					'status' =>'success',
-					'message' => $req->getParam('position'),
 				], 200);
 			} else {
 				return $res->withJson([
 					'status' => 'error'
-				]);
+				], 200);
 			}
 		} catch (Exception $e) {
 			return $res->withJson([
@@ -238,7 +237,7 @@ class EmployeeController
 				], 200);
 			} else {
 				return $res->withJson([
-					'status' => 'success',
+					'status' => 'error',
 				], 200);
 			}
 		} catch (Exception $e) {
