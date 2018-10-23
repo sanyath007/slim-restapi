@@ -13,11 +13,42 @@ class EmployeeController
         $this->container = $container;
     }
 
-    public function home($request, $response, $args) 
+    public function info($req, $res, $args)
     {
-      // your code here
-      // use $this->view to render the HTML
-      return $response;
+    	try {
+			$cid = $args['cid'];
+			$conn = $this->container->db;
+
+			$sql = "SELECT e.*, p.position_name 
+					FROM employees e 
+					LEFT JOIN positions p ON (e.position_id=p.id) 
+					WHERE (emp_id=:cid)";
+
+			$pre = $conn->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
+			$values = [':cid' => $cid];
+
+			$pre->execute($values);
+			$result = $pre->fetch();
+			
+			if ($result) {
+				return $res->withJson([
+					'status' => 'success',
+					'employee' => [
+						'cid' => $result['emp_id'],
+						'fullName' => $result['prefix'] . $result['emp_fname']. ' ' .$result['emp_lname'],
+						'position' => $result['position_name'] . $result['position_level']
+					]
+				], 200);
+			} else {
+				return $res->withJson([
+					'status' => 'error',
+				]);
+			}		
+		} catch (Exception $e) {
+			return $res->withJson([
+				'error' => $e->getMessage()
+			], 442);
+		}
     }
 
     public function employee($req, $res, $args)
@@ -39,15 +70,12 @@ class EmployeeController
 			
 			if ($result) {
 				return $res->withJson([
-					'employee' => [
-						'cid' => $result['emp_id'],
-						'fullName' => $result['prefix'] . $result['emp_fname']. ' ' .$result['emp_lname'],
-						'position' => $result['position_name'] . $result['position_level']
-					]
+					'status' => 'success',
+					'employee' => $result,
 				], 200);
 			} else {
 				return $res->withJson([
-					$result
+					'status' => 'error',
 				]);
 			}		
 		} catch (Exception $e) {
@@ -71,10 +99,12 @@ class EmployeeController
 			
 			if ($result) {
 				return $res->withJson([
+					'status' =>'success',
 					'employees' => $result
 				], 200);
 			} else {
 				return $res->withJson([
+					'status' => 'error',
 					$result
 				]);
 			}		
@@ -99,12 +129,14 @@ class EmployeeController
 			
 			if ($result) {
 				return $res->withJson([
+					'status' =>'success',
 					'positions' => $result
 				], 200);
 			} else {
 				return $res->withJson([
+					'status' => 'error',
 					$result
-				], 442);
+				]);
 			}		
 		} catch (Exception $e) {
 			return $res->withJson([
@@ -143,7 +175,44 @@ class EmployeeController
 			} else {
 				return $res->withJson([
 					'status' => 'error'
-				], 422);
+				]);
+			}
+		} catch (Exception $e) {
+			return $res->withJson([
+				'status' => 'error',
+				'message' => $e->getMessage()
+			], 442);
+		}
+    }
+
+    public function employeeUpdate($req, $res, $args)
+    {
+    	try {
+			$conn = $this->container->db;
+
+			$sql = "UPDATE employees SET prefix=:prefix,emp_fname=:fname,emp_lname=:lname,birthdate=:birthdate,sex=:sex,position_id=:position,position_level=:level,updated_at=:updated WHERE (emp_id=:cid)";
+			
+			$pre = $conn->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
+			$pre->bindParam(":cid", $args['cid']);
+			// $pre->bindParam(":emp_id", $req->getParam('cid'));
+			$pre->bindParam(":prefix", $req->getParam('prefix'));
+			$pre->bindParam(":fname", $req->getParam('fname'));
+			$pre->bindParam(":lname", $req->getParam('lname'));
+			$pre->bindParam(":birthdate", $req->getParam('birthdate'));
+			$pre->bindParam(":sex", $req->getParam('sex'));
+			$pre->bindParam(":position", $req->getParam('position'));
+			$pre->bindParam(":level", $req->getParam('level'));
+			$pre->bindParam(":updated", date('Y-m-d H:i:s'));
+
+			if ($pre->execute()) {
+				return $res->withJson([
+					'status' =>'success',
+					'message' => $req->getParam('position'),
+				], 200);
+			} else {
+				return $res->withJson([
+					'status' => 'error'
+				]);
 			}
 		} catch (Exception $e) {
 			return $res->withJson([

@@ -57,15 +57,18 @@ $app->add(function ($req, $res, $next) {
 /** =============== ROUTES =============== */
 $app->get('/user/{cid}', 'UserController:user');
 
+$app->get('/info/{cid}', 'EmployeeController:info');
 $app->get('/employee/{cid}', 'EmployeeController:employee');
 $app->get('/employees', 'EmployeeController:employeeList');
 $app->post('/employee-add', 'EmployeeController:employeeAdd');
+$app->put('/employee-update/{cid}', 'EmployeeController:employeeUpdate');
 $app->delete('/employee-del/{cid}', 'EmployeeController:employeeDel');
 $app->get('/positions', 'EmployeeController:positionList');
 
-$app->get('/checkin', 'CheckinController:checkinList');
+$app->get('/checkin/{date}', 'CheckinController:checkinList');
 $app->post('/checkin', 'CheckinController:checkin');
 $app->post('/upload', 'CheckinController:upload');
+$app->post('/avatar', 'CheckinController:avatar');
 
 /** use this route if page not found. */
 $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/routes:.+', function ($req, $res) {

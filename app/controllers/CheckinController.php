@@ -13,18 +13,21 @@ class CheckinController
         $this->container = $container;
     }
 
-    public function checkinList($req, $res) 
+    public function checkinList($req, $res, $args) 
     {
 	    try {
+	    	$checkin_date = $args['date'];
 			$conn = $this->container->db;
 
 			$sql = "SELECT c.emp_id, CONCAT(e.prefix, e.emp_fname, ' ', e.emp_lname) as emp_name,
 					c.checkin_date, TIME(timein) as timein, timein_score, timein_img 
-					FROM checkin c LEFT JOIN employees e ON (c.emp_id=e.emp_id)";
+					FROM checkin c LEFT JOIN employees e ON (c.emp_id=e.emp_id)
+					WHERE (checkin_date=:checkin_date)";
 
 			$pre = $conn->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
-			
-			$pre->execute();
+			$values = [ ':checkin_date' => $checkin_date ];
+
+			$pre->execute($values);
 			$result = $pre->fetchAll();
 
 			if ($result) {
@@ -33,8 +36,8 @@ class CheckinController
 				], 200);
 			} else {
 				return $res->withJson([
-					$result
-				], 442);
+					'status' => 'error',
+				]);
 			}		
 		} catch (Exception $e) {
 			return $res->withJson([
@@ -76,7 +79,7 @@ class CheckinController
 			} else {
 				return $res->withJson([
 					'status' => 'error'
-				], 422);
+				]);
 			}
 		} catch (Exception $e) {
 			return $res->withJson([
