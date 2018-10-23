@@ -124,7 +124,7 @@ class EmployeeController
 
 			$pre = $conn->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
 
-			$pre->execute($values);
+			$pre->execute();
 			$result = $pre->fetchAll();
 			
 			if ($result) {
