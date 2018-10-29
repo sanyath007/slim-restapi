@@ -119,7 +119,7 @@ class CheckinController
 		} else {
 			return $res->withJson([
 				'status' => 'error',
-				'message' => '/uploads/ directory not found.',
+				'message' => $target_dir . ' directory not found.',
 			]);
 		}
     }
@@ -141,5 +141,15 @@ class CheckinController
     	}
 
     	return $score;
+    }
+
+    public function timeinImg ($req, $res, $args)
+    {
+    	$data = $args['data'];
+    	$image = @file_get_contents($_SERVER['DOCUMENT_ROOT'] . "/../uploads/" . $data);
+
+    	$res->write($image);
+
+    	return $res->withHeader('Content-Type', 'image/png');
     }
 }

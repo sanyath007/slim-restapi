@@ -1,6 +1,6 @@
 <?php
-require('vendor/autoload.php');
-include('config.php');
+require('../vendor/autoload.php');
+include('../config.php');
 
 $app = new Slim\App(['settings' => $config]);
 
@@ -69,10 +69,11 @@ $app->get('/checkin/{date}', 'CheckinController:checkinList');
 $app->post('/checkin', 'CheckinController:checkin');
 $app->post('/upload', 'CheckinController:upload');
 $app->post('/avatar', 'CheckinController:avatar');
+$app->get('/timein-img/{data}', 'CheckinController:timeinImg');
 
 /** use this route if page not found. */
 $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/routes:.+', function ($req, $res) {
-	$handler = $this->notFoundHandler; //useing default slim page not found handler.
+	$handler = $this->notFoundHandler; //using default slim page not found handler.
 	return $handler($req, $res);
 });
 /** =============== ROUTES =============== */
