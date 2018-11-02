@@ -152,4 +152,33 @@ class CheckinController
 
     	return $res->withHeader('Content-Type', 'image/png');
     }
+
+    public function checkinChart ($req, $res, $args)
+    {
+    	try {
+	    	$checkin_date = $args['date'];
+			$conn = $this->container->db;
+
+			$sql = "SELECT CONCAT('คะแนน ', timein_score) AS score, COUNT(id) AS num 
+					FROM checkin WHERE (checkin_date=:checkin_date) GROUP BY timein_score ";
+
+			$pre = $conn->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
+			$values = [ ':checkin_date' => $checkin_date ];
+
+			$pre->execute($values);
+			$result = $pre->fetchAll();
+
+			if ($result) {
+				return $res->withJson($result, 200);
+			} else {
+				return $res->withJson([
+					'status' => 'error',
+				]);
+			}		
+		} catch (Exception $e) {
+			return $res->withJson([
+				'error' => $e->getMessage()
+			], 442);
+		}
+    }
 }

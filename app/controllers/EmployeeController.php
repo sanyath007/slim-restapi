@@ -190,23 +190,42 @@ class EmployeeController
     	try {
 			$conn = $this->container->db;
 
-			$sql = "UPDATE employees SET prefix=:prefix,emp_fname=:fname,emp_lname=:lname,birthdate=:birthdate,sex=:sex,position_id=:position,position_level=:level,updated_at=:updated WHERE (emp_id=:cid)";
+			$prefix = $req->getParam('prefix');
+			$fname = $req->getParam('fname');
+			$lname = $req->getParam('lname');
+			$birthdate = $req->getParam('birthdate');
+			$sex = $req->getParam('sex');
+			$position = $req->getParam('position');
+			$level = $req->getParam('level');
+			$updated = date('Y-m-d H:i:s');
+
+			$sql = "UPDATE employees SET ";
+			if ($prefix != '') $sql .= "prefix=:prefix, ";
+			if ($fname != '') $sql .= "emp_fname=:fname, ";
+			if ($lname != '') $sql .= "emp_lname=:lname, ";
+			if ($birthdate != '') $sql .= "birthdate=:birthdate, ";
+			if ($sex != '') $sql .= "sex=:sex, ";
+			if ($position != '') $sql .= "position_id=:position, ";
+			if ($level != '') $sql .= "position_level=:level, ";
+			$sql .= "updated_at=:updated ";
+			$sql .= "WHERE (emp_id=:cid)";
 			
 			$pre = $conn->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
 			$pre->bindParam(":cid", $args['cid']);
 			// $pre->bindParam(":emp_id", $req->getParam('cid'));
-			$pre->bindParam(":prefix", $req->getParam('prefix'));
-			$pre->bindParam(":fname", $req->getParam('fname'));
-			$pre->bindParam(":lname", $req->getParam('lname'));
-			$pre->bindParam(":birthdate", $req->getParam('birthdate'));
-			$pre->bindParam(":sex", $req->getParam('sex'));
-			$pre->bindParam(":position", $req->getParam('position'));
-			$pre->bindParam(":level", $req->getParam('level'));
-			$pre->bindParam(":updated", date('Y-m-d H:i:s'));
+			if ($prefix != '') { $pre->bindParam(":prefix", $prefix); }
+			if ($fname != '') { $pre->bindParam(":fname", $fname); }
+			if ($lname != '') $pre->bindParam(":lname", $lname);
+			if ($birthdate != '') $pre->bindParam(":birthdate", $birthdate);
+			if ($sex != '') $pre->bindParam(":sex", $sex);
+			if ($position != '') $pre->bindParam(":position", $position);
+			if ($level != '') $pre->bindParam(":level", $level);
+
+			$pre->bindParam(":updated", $updated);
 
 			if ($pre->execute()) {
 				return $res->withJson([
-					'status' =>'success',
+					'status' => 'success'
 				], 200);
 			} else {
 				return $res->withJson([
