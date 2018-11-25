@@ -65,11 +65,12 @@ $app->put('/employee-update/{cid}', 'EmployeeController:employeeUpdate');
 $app->delete('/employee-del/{cid}', 'EmployeeController:employeeDel');
 $app->get('/positions', 'EmployeeController:positionList');
 
-$app->get('/checkin/{date}', 'CheckinController:checkinList');
 $app->post('/checkin', 'CheckinController:checkin');
 $app->post('/upload', 'CheckinController:upload');
 $app->post('/avatar', 'CheckinController:avatar');
 $app->get('/timein-img/{data}', 'CheckinController:timeinImg');
+$app->get('/checkin-all/{month}', 'CheckinController:checkinAll');
+$app->get('/checkin/{date}', 'CheckinController:checkinList');
 $app->get('/checkin-chart/{date}', 'CheckinController:checkinChart');
 
 /** use this route if page not found. */

@@ -13,6 +13,43 @@ class CheckinController
         $this->container = $container;
     }
 
+    public function checkinAll($req, $res, $args) 
+    {
+	    try {
+	    	$month = $args['month'];
+	    	$sdate = $month . '-01';
+	     	$edate = date("Y-m-t", strtotime($sdate));
+
+			$conn = $this->container->db;
+
+			$sql = "SELECT c.emp_id, CONCAT(e.prefix, e.emp_fname, ' ', e.emp_lname) as emp_name,
+					c.checkin_date, TIME(timein) as timein, timein_score, timein_img 
+					FROM checkin c LEFT JOIN employees e ON (c.emp_id=e.emp_id) 
+					WHERE (checkin_date BETWEEN :sdate AND :edate)
+					ORDER By checkin_date ";
+
+			$pre = $conn->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
+			$values = [ ':sdate' => $sdate, ':edate' => $edate ];
+
+			$pre->execute($values);
+			$result = $pre->fetchAll();
+
+			if ($result) {
+				return $res->withJson([
+					'checkins' => $result
+				], 200);
+			} else {
+				return $res->withJson([
+					'status' => 'error',
+				]);
+			}		
+		} catch (Exception $e) {
+			return $res->withJson([
+				'error' => $e->getMessage()
+			], 442);
+		}
+    }
+
     public function checkinList($req, $res, $args) 
     {
 	    try {
