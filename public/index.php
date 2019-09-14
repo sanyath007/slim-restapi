@@ -70,6 +70,8 @@ $app->post('/upload', 'CheckinController:upload');
 $app->post('/avatar', 'CheckinController:avatar');
 $app->get('/timein-img/{data}', 'CheckinController:timeinImg');
 $app->get('/checkin-all/{month}', 'CheckinController:checkinAll');
+$app->get('/checkin-score/{month}', 'CheckinController:checkinScore');
+$app->get('/checkin-time/{month}', 'CheckinController:checkinTime');
 $app->get('/checkin/{date}', 'CheckinController:checkinList');
 $app->get('/checkin-chart/{date}', 'CheckinController:checkinChart');
 
