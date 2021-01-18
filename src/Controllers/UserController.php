@@ -1,23 +1,16 @@
 <?php
+
 namespace App\Controllers;
 
-use Psr\Container\ContainerInterface;
+use App\Controllers\Controller;
 
-class UserController
+class UserController extends Controller
 {
-	protected $container;
-    protected $view;
-
-    public function __construct(ContainerInterface $container) 
-    {
-        $this->container = $container;
-    }
-
     public function home($request, $response, $args) 
     {
-      // your code here
-      // use $this->view to render the HTML
-      return $response;
+		// your code here
+		// use $this->view to render the HTML
+		return $response;
     }
 
     public function user($req, $res, $args)

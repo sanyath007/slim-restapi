@@ -1,24 +1,16 @@
 <?php
 namespace App\Controllers;
 
-use Psr\Container\ContainerInterface;
+use App\Controllers\Controller;
 
-class CheckinController
+class CheckinController extends Controller
 {
-	protected $container;
-    protected $view;
-
-    public function __construct(ContainerInterface $container) 
-    {
-        $this->container = $container;
-    }
-
     public function checkinAll($req, $res, $args) 
     {
-	    try {
-	    	$month = $args['month'];
-	    	$sdate = $month . '-01';
-	     	$edate = date("Y-m-t", strtotime($sdate));
+		try {
+			$month = $args['month'];
+			$sdate = $month . '-01';
+			$edate = date("Y-m-t", strtotime($sdate));
 
 				$conn = $this->container->db;
 

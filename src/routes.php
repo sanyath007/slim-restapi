@@ -1,25 +1,15 @@
 <?php
 
-$app->options('./{routes:.+}', function ($req, $res) {
-	return $res;
+$app->options('/{routes:.+}', function($request, $response, $args) {
+    return $response;
 });
 
 $app->add(function ($req, $res, $next) {
-
-	if ($req->getMethod() !== 'OPTIONS') {
-		$response = $next($req, $res);
-
-		return $response
-				->withHeader('Access-Control-Allow-Origin', '*')
-				->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-				->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-	}
-
-	$res = $res->withHeader('Access-Control-Allow-Origin', '*');
-	$res = $res->withHeader('Access-Control-Allow-Methods', $req->getHeaderLine('Access-Control-Request-Method'));
-	$res = $res->withHeader('Access-Control-Allow-Headers', $req->getHeaderLine('Access-Control-Request-Headers'));
-
-	return $next($req, $res);
+    $response = $next($req, $res);
+    return $response
+            ->withHeader('Access-Control-Allow-Origin', 'http://localhost:3000')
+            ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 });
 
 /** =============== ROUTES =============== */
@@ -44,8 +34,8 @@ $app->get('/checkin/{date}', 'CheckinController:checkinList');
 $app->get('/checkin-chart/{date}', 'CheckinController:checkinChart');
 
 /** use this route if page not found. */
-$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/routes:.+', function ($req, $res) {
-	$handler = $this->notFoundHandler; //using default slim page not found handler.
-	return $handler($req, $res);
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
+    $handler = $this->notFoundHandler; // handle using the default Slim page not found handler
+    return $handler($req, $res);
 });
 /** =============== ROUTES =============== */

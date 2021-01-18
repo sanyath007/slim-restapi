@@ -1,18 +1,10 @@
 <?php
 namespace App\Controllers;
 
-use Psr\Container\ContainerInterface;
+use App\Controllers\Controller;
 
-class EmployeeController
+class EmployeeController extends Controller
 {
-	protected $container;
-    protected $view;
-
-    public function __construct(ContainerInterface $container) 
-    {
-        $this->container = $container;
-    }
-
     public function info($req, $res, $args)
     {
     	try {
